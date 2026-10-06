@@ -1,12 +1,14 @@
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
-using UnityEngine.Rendering;
 
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController controller;
+
     public float speed = 12f;
     public float gravity = -9.81f;
+
+    public float maxfuel = 4f;
+    public float thrustForce = 8f;
 
     public Transform groundCheck;
     public float groundDistance = 0.4f;
@@ -14,36 +16,60 @@ public class PlayerMovement : MonoBehaviour
 
     Vector3 velocity;
     bool isGrounded;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private float curfuel;
+
     void Start()
     {
-        
+        curfuel = maxfuel;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-        
+        // Comprobar si estamos en el suelo
+        isGrounded = Physics.CheckSphere(
+            groundCheck.position,
+            groundDistance,
+            groundMask
+        );
+
+        // Si estamos en el suelo
         if (isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
 
+        // Movimiento
         float X = Input.GetAxis("Horizontal");
         float Z = Input.GetAxis("Vertical");
 
         Vector3 move = transform.right * X + transform.forward * Z;
 
-        controller.Move(move * speed* Time.deltaTime);
+        controller.Move(move * speed * Time.deltaTime);
 
-        if(Input.GetButtonDown("Jump") && isGrounded)
+        // Salto normal
+        if (Input.GetButtonDown("Jump") && isGrounded)
         {
             velocity.y = Mathf.Sqrt(-2f * gravity);
         }
 
+        // Jetpack
+        if (Input.GetKey(KeyCode.Space) && curfuel > 0)
+        {
+            velocity.y = thrustForce;
+            curfuel -= Time.deltaTime;
+        }
+
+        // Recargar combustible cuando estamos en el suelo
+        if (isGrounded)
+        {
+            curfuel += Time.deltaTime;
+            curfuel = Mathf.Clamp(curfuel, 0, maxfuel);
+        }
+
+        // Gravedad
         velocity.y += gravity * Time.deltaTime;
 
-        controller.Move(velocity* Time.deltaTime);
+        // Movimiento vertical
+        controller.Move(velocity * Time.deltaTime);
     }
 }
