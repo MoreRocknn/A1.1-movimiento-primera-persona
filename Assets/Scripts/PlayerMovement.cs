@@ -3,7 +3,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController controller;
-
+    public Animator anim;
     public float speed = 12f;
     public float gravity = -9.81f;
 
@@ -23,6 +23,8 @@ public class PlayerMovement : MonoBehaviour
         curfuel = maxfuel;
     }
 
+    
+
     void Update()
     {
         // Comprobar si estamos en el suelo
@@ -40,7 +42,11 @@ public class PlayerMovement : MonoBehaviour
 
         // Movimiento
         float X = Input.GetAxis("Horizontal");
+        anim.SetFloat("Sideways", X);
+
         float Z = Input.GetAxis("Vertical");
+        anim.SetFloat("Forward", Z);
+
 
         Vector3 move = transform.right * X + transform.forward * Z;
 
