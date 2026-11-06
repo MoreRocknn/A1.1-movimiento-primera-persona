@@ -1,5 +1,5 @@
 using UnityEngine;
-
+using UnityEngine.UI;
 public class PlayerMovement : MonoBehaviour
 {
     public CharacterController controller;
@@ -14,6 +14,7 @@ public class PlayerMovement : MonoBehaviour
     public float groundDistance = 0.4f;
     public LayerMask groundMask;
 
+    public Image fuelSlider;
     Vector3 velocity;
     bool isGrounded;
     private float curfuel;
@@ -21,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         curfuel = maxfuel;
+        UpdateFuelUI();
     }
 
     
@@ -77,5 +79,10 @@ public class PlayerMovement : MonoBehaviour
 
         // Movimiento vertical
         controller.Move(velocity * Time.deltaTime);
+        UpdateFuelUI();
+    }
+    void UpdateFuelUI()
+    {
+        fuelSlider.fillAmount = curfuel / maxfuel;
     }
 }
